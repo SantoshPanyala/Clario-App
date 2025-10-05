@@ -1,3 +1,4 @@
+// Triggering a fresh Vercel deployment
 import React, { useState } from 'react';
 import { Header } from './components/sections/Header';
 import { EmptyState } from './components/sections/EmptyState';
