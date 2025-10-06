@@ -49,11 +49,25 @@ function App() {
         setReportData(null);
         setErrorMessage('');
 
+        // Determine if input is a URL
+        const isUrl = (string) => {
+            try {
+                new URL(string);
+                return true;
+            } catch (_) {
+                return false;
+            }
+        };
+
+        const requestBody = isUrl(inputValue.trim()) 
+            ? { urlToAnalyze: inputValue.trim() }
+            : { textToAnalyze: inputValue };
+
         try {
             const response = await fetch('/api/analyze', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ textToAnalyze: inputValue }),
+                body: JSON.stringify(requestBody),
             });
 
             if (!response.ok) {

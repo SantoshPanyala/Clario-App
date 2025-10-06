@@ -13,10 +13,34 @@ export default async function handler(req, res) {
         return res.status(405).end('Method Not Allowed');
     }
 
-    const { textToAnalyze } = req.body;
+    const { textToAnalyze, urlToAnalyze } = req.body;
 
-    if (!textToAnalyze) {
-        return res.status(400).json({ message: 'No text provided for analysis.' });
+    if (!textToAnalyze && !urlToAnalyze) {
+        return res.status(400).json({ message: 'No text or URL provided for analysis.' });
+    }
+
+    let contentToAnalyze = textToAnalyze;
+
+    // If URL is provided, scrape the website first
+    if (urlToAnalyze && !textToAnalyze) {
+        try {
+            const scrapeResponse = await fetch(`${req.headers.origin || 'http://localhost:3000'}/api/scrape-url`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ url: urlToAnalyze }),
+            });
+
+            if (!scrapeResponse.ok) {
+                const errorData = await scrapeResponse.json();
+                return res.status(scrapeResponse.status).json({ message: errorData.message });
+            }
+
+            const scrapeData = await scrapeResponse.json();
+            contentToAnalyze = scrapeData.contentForAnalysis;
+        } catch (error) {
+            console.error('Error scraping URL:', error);
+            return res.status(500).json({ message: 'Failed to scrape website content.' });
+        }
     }
 
     const promptTemplate = `
@@ -24,9 +48,9 @@ export default async function handler(req, res) {
       1. "conversionPerformance": A string representing a score out of 10 (e.g., "6/10").
       2. "pageStrengths": An array of 2-3 short strings highlighting what the page does well (e.g., "Clear Brand Identity", "High-Quality Imagery").
       3. "croHypotheses": This must be an array of 4 to 5 objects. Each object represents a major area for improvement and MUST contain the following four keys: "title" (string), "projectedImpact" (string), "category" (string), and "suggestions" (an array of objects, where each object has "type", "current", and "proposed" keys).
-      Here is the landing page text to analyze:
+      Here is the content to analyze:
       ---
-      ${textToAnalyze}
+      ${contentToAnalyze}
       ---
     `;
 
