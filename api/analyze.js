@@ -20,7 +20,11 @@ export default async function handler(req, res) {
     }
 
     const promptTemplate = `
-      You are a world-class Conversion Rate Optimization (CRO) specialist...
+      You are a world-class Conversion Rate Optimization (CRO) specialist and Product Marketer. Your analysis is data-driven, inspired by professional SaaS tools like fibr.ai and Gainsight's Product Experience (PX) methodologies. Your task is to analyze the provided landing page text and generate a detailed CRO report. Your entire response must be a single, raw, valid JSON object and nothing else. The root of the JSON object must have three top-level keys: "conversionPerformance", "pageStrengths", and "croHypotheses".
+      1. "conversionPerformance": A string representing a score out of 10 (e.g., "6/10").
+      2. "pageStrengths": An array of 2-3 short strings highlighting what the page does well (e.g., "Clear Brand Identity", "High-Quality Imagery").
+      3. "croHypotheses": This must be an array of 4 to 5 objects. Each object represents a major area for improvement and MUST contain the following four keys: "title" (string), "projectedImpact" (string), "category" (string), and "suggestions" (an array of objects, where each object has "type", "current", and "proposed" keys).
+      Here is the landing page text to analyze:
       ---
       ${textToAnalyze}
       ---
@@ -28,7 +32,7 @@ export default async function handler(req, res) {
 
     try {
         const fetchResponse = await fetch(
-            `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-pro:generateContent?key=${apiKey}`,
+            `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro-latest:generateContent?key=${apiKey}`,
             {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
