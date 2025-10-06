@@ -31,8 +31,21 @@ export default async function handler(req, res) {
     `;
 
     try {
+        // First, let's try to list available models for debugging
+        console.log("Attempting to list available models...");
+        const listModelsResponse = await fetch(
+            `https://generativelanguage.googleapis.com/v1beta/models?key=${apiKey}`
+        );
+        
+        if (listModelsResponse.ok) {
+            const modelsData = await listModelsResponse.json();
+            console.log("Available models:", JSON.stringify(modelsData, null, 2));
+        } else {
+            console.log("Could not list models:", listModelsResponse.status);
+        }
+
         const fetchResponse = await fetch(
-            `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro-latest:generateContent?key=${apiKey}`,
+            `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key=${apiKey}`,
             {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
