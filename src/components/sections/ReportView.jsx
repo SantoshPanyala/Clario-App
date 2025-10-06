@@ -3,13 +3,19 @@ import { Button } from "@/components/ui/button"; // Import Button
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import { downloadReportPDF } from "@/lib/pdfGenerator";
 
 // Update the component to accept the onGoBack prop
 export function ReportView({ data, onGoBack }) {
     if (!data) return null;
 
     const handleDownloadPdf = () => {
-        alert("Download PDF functionality will be implemented here.");
+        try {
+            downloadReportPDF(data);
+        } catch (error) {
+            console.error('Error generating PDF:', error);
+            alert('Error generating PDF. Please try again.');
+        }
     };
 
     return (
